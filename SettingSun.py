@@ -20,7 +20,6 @@ class SettingSun:
 
     def solve_setting_sun(self):
         positions = set()
-        positions.add(self.get_position())
         solution = []
         
         if self.solve(positions=positions, solution=solution):
@@ -29,6 +28,7 @@ class SettingSun:
             print("No solution found!")
 
     def solve(self, positions, solution):
+        print(solution)
         # base case
         if self.has_finished() : 
             self.solution = solution
@@ -40,6 +40,7 @@ class SettingSun:
         # recursive case
         valid_moves = self.get_valid_moves()
         for p, d in valid_moves.items():
+
             self.move_piece(p, d)
             new_pos = self.get_position()
             positions.add(new_pos)
@@ -146,7 +147,7 @@ class SettingSun:
                 if self.is_valid_move(piece=piece, direction=direction):
                     moves[piece].append(direction)
 
-        return moves
+        return {p:m for p, m in moves.items() if m}
 
     def has_finished(self):
         return self.get_sun() == WIN_COORDS
