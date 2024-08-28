@@ -29,6 +29,10 @@ class SettingSun:
             print("No solution found!")
 
     def solve(self, positions, solution):
+        print("Board:")
+        print(self.board)
+        print("")
+
         # base case
         if self.is_solved() : 
             self.solution = solution
@@ -40,17 +44,17 @@ class SettingSun:
         # recursive case
         positions.add(pos) # visit this position
         
-        valid_moves = self.get_valid_moves()
-        for p, directions in valid_moves.items():
-            for d in directions:
-                self.move_piece(p, d)
-                solution.append(f"Move piece {p}: {d}")
-
-                if self.solve(positions=positions, solution=solution):
+        # recursive case
+        moves = self.get_valid_moves()
+        for piece, directions in moves.items():
+            for direction in directions:
+                self.move_piece(piece, direction)
+                solution.append(f"Moved piece {piece} {direction}")
+                if self.solve(positions, solution):
                     return True
-                
-                # backtrack- reset board to how it was.
-                self.move_piece(p, UNDO_MOVE[d])
+
+                # backtrack
+                self.move_piece(piece, UNDO_MOVE[direction])
 
         return False
 
