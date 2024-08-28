@@ -5,11 +5,12 @@ N_COLS = 4
 VALID_COORDS = {(r, c) for r in range(N_ROWS) for c in range(N_COLS)}
 WIN_COORDS = {(r, c) for r in range(3, 5) for c in range(1, 3)}
 DIRECTIONS = ["LEFT", "RIGHT", "UP", "DOWN"]
+UNDO_MOVE = {k:v for k,v in zip(DIRECTIONS, ["RIGHT", "LEFT", "DOWN", "UP"])}
 
 class SettingSun:
     def __init__(self):
         self.board = np.zeros(shape=(N_ROWS, N_COLS))
-        self.solution = None
+        self.solution = []
 
     def setup(self):
         pieces = [1, 0, 0, 2, 1, 0, 0, 2, -1, 3, 3, -1, 4, 6, 7, 5, 4, 8, 9, 5]
@@ -28,9 +29,8 @@ class SettingSun:
             print("No solution found!")
 
     def solve(self, positions, solution):
-        print(solution)
         # base case
-        if self.has_finished() : 
+        if self.is_solved() : 
             self.solution = solution
             return True
 
@@ -38,20 +38,19 @@ class SettingSun:
         if pos in positions : return False # No progress- I've been here before!!
 
         # recursive case
+        positions.add(pos) # visit this position
+        
         valid_moves = self.get_valid_moves()
-        for p, d in valid_moves.items():
+        for p, directions in valid_moves.items():
+            for d in directions:
+                self.move_piece(p, d)
+                solution.append(f"Move piece {p}: {d}")
 
-            self.move_piece(p, d)
-            new_pos = self.get_position()
-            positions.add(new_pos)
-            solution.append(f"Move piece {p}: {d}")
-
-            if self.solve(positions=positions, solution=solution):
-                return True
-            
-            # backtrack
-            solution.pop()
-            positions.remove(new_pos)
+                if self.solve(positions=positions, solution=solution):
+                    return True
+                
+                # backtrack- reset board to how it was.
+                self.move_piece(p, UNDO_MOVE[d])
 
         return False
 
@@ -149,7 +148,7 @@ class SettingSun:
 
         return {p:m for p, m in moves.items() if m}
 
-    def has_finished(self):
+    def is_solved(self):
         return self.get_sun() == WIN_COORDS
     
     def show_solution(self):
