@@ -63,7 +63,7 @@ class SettingSun:
         return set(self.get_piece_coords(0))
     
     def get_position(self):
-        return str([self.get_piece_coords(p)[0] for p in range(10)])
+        return str(self.board)
 
     def get_piece_coords(self, piece):
         return [(r, c) for r, c in np.argwhere(self.board == piece)]
